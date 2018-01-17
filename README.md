@@ -6,6 +6,8 @@
 
 ## Installation
 
-1. (If your Python 2 installation is done by a version manager such as VirtualEnv, don't forget to activate it!)
+1. If your Python 2 installation is done by a version manager such as VirtualEnv, don't forget to activate it, for example:
+    1. `make virtualenv`
+    1. `source ~/virtualenv-ansible/bin/activate`
 1. `make install`
 1. `make ansible_install_roles`
