@@ -1,1 +1,11 @@
-# my_ansible_playbooks
+# My Ansible Playbooks
+
+## Requirements
+
+* Python 2: Since Ansible currently has insufficient Python 3 support :-( You may use VirtualEnv or some similar Python version manager to setup a Python 2 installation.
+
+## Installation
+
+1. (If your Python 2 installation is done by a version manager such as VirtualEnv, don't forget to activate it!)
+1. `make install`
+1. `make ansible_install_roles`
