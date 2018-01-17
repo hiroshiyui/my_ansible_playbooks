@@ -2,7 +2,7 @@
 
 ## Requirements
 
-* Python 2: Since Ansible currently has insufficient Python 3 support :-( You may use VirtualEnv or some similar Python version manager to setup a Python 2 installation.
+* Python 2: Since Ansible currently has insufficient Python 3 support :-( You may want to use VirtualEnv or some similar Python version manager to setup a Python 2 installation.
 
 ## Installation
 
