@@ -15,6 +15,8 @@
         state: present
         disk_size: 10
         ip_forward: yes
+        tags:
+          - openvpn-server
       register: gce
 
     - name: Debug
@@ -35,3 +37,22 @@
         state: started
         timeout: 30
       with_items: "{{ gce.instance_data }}"
+
+- name: Setup OpenVPN
+  hosts: my-gce-openvpn
+  roles:
+    - Stouts.openvpn
+  become: true
+  gather_facts: yes
+  vars:
+    openvpn_key_size: 2048
+    openvpn_use_pam: yes
+    openvpn_clients:
+      - my-gce-openvpn
+    openvpn_server_options:
+      - 'management 127.0.0.1 9801'
+      - 'tun-mtu 1500'
+      - 'mssfix 1300'
+    openvpn_client_options:
+      - 'tun-mtu 1500'
+      - 'mssfix 1300'
