@@ -11,3 +11,7 @@
     1. `source ~/virtualenv-ansible/bin/activate`
 1. `make install`
 1. `make ansible_install_roles`
+
+## Nice play (maybe)
+
+* `make ansible_setup_gce_openvpn ANSIBLE_USER=gcp_account_name`: Launch an OpenVPN server GCE instance.
