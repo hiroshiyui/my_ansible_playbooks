@@ -1,0 +1,39 @@
+---
+- name: Install iptables-persistent
+  apt:
+    name: iptables-persistent
+    update_cache: yes
+
+- name: Setup iptables rules
+  block:
+    - iptables:
+        chain: INPUT
+        in_interface: tun+
+        jump: ACCEPT
+
+    - iptables:
+        chain: OUTPUT
+        out_interface: tun+
+        jump: ACCEPT
+
+    - iptables:
+        chain: FORWARD
+        in_interface: ens4
+        out_interface: tun+
+        jump: ACCEPT
+
+    - iptables:
+        chain: FORWARD
+        in_interface: tun+
+        out_interface: ens4
+        jump: ACCEPT
+
+    - iptables:
+        table: nat
+        chain: POSTROUTING
+        source: 10.0.0.0/8
+        out_interface: ens4
+        jump: MASQUERADE
+
+- name: Save iptables rules
+  shell: "iptables-save > /etc/iptables/rules.v4"
