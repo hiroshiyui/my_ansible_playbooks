@@ -38,10 +38,22 @@
         timeout: 30
       with_items: "{{ gce.instance_data }}"
 
+    - name: Setup GCP firewall rules
+      gce_net:
+        name: default
+        fwname: openvpn-server
+        allowed: udp:1194
+        state: present
+        src_range:
+          - '0.0.0.0/0'
+        target_tags:
+          - openvpn-server
+
 - name: Setup OpenVPN
   hosts: my-gce-openvpn
   roles:
     - Stouts.openvpn
+    - openvpn-server
   become: true
   gather_facts: yes
   vars:
@@ -53,6 +65,7 @@
       - 'management 127.0.0.1 9801'
       - 'tun-mtu 1500'
       - 'mssfix 1300'
+      - 'push "redirect-gateway def1 bypass-dhcp"'
     openvpn_client_options:
       - 'tun-mtu 1500'
       - 'mssfix 1300'
