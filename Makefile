@@ -19,3 +19,6 @@ ansible_install_roles:
 
 ansible_setup_gce_openvpn: .check_ansible_user
 	export $$(cat .env-gcp | xargs) && ansible-playbook -u $(ANSIBLE_USER) playbooks/openvpn-gce.yml
+
+ansible_setup_gce_alway_free_resources: .check_ansible_user
+	export $$(cat .env-gcp | xargs) && ansible-playbook -u $(ANSIBLE_USER) playbooks/gce-always-free-resources.yml

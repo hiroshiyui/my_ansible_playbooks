@@ -1,0 +1,31 @@
+---
+# ref: https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/#install-docker-ce
+- name: Setup Docker CE
+  become: true
+  block:
+    - name: Install required packages
+      apt:
+        name: '{{ item }}'
+        update_cache: yes
+      with_items:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - software-properties-common
+
+    - name: Add Docker’s official GPG key
+      shell: 'curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -'
+
+    - name: Set up the Docker CE stable repository
+      shell: 'add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"'
+
+    - name: Install Docker CE
+      apt:
+        name: docker-ce
+        update_cache: yes
+
+    - name: Add user to group 'docker'
+      user:
+        name: '{{ ansible_user }}'
+        groups: docker
+        append: yes

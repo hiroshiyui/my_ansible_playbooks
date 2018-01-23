@@ -1,0 +1,49 @@
+---
+- hosts: 127.0.0.1
+  connection: local
+  vars:
+    zone: us-west1-b
+  tasks:
+    - name: Create a GCE instance
+      gce:
+        name: 'my-always-free-instance-{{ zone }}'
+        zone: '{{ zone }}'
+        num_instances: 1
+        machine_type: f1-micro
+        image: ubuntu-1604-xenial-v20180112
+        image_family: ubuntu-1604-lts
+        state: present
+        ip_forward: yes
+        tags:
+          - my-always-free-instance
+      register: gce
+
+    - name: Debug
+      debug:
+        msg: '{{ gce }}'
+
+    - name: Add host to a group
+      add_host:
+        hostname: '{{ item.public_ip }}'
+        groupname: my-always-free-instance
+      with_items: '{{ gce.instance_data }}'
+
+    - name: Wait for SSH
+      wait_for:
+        delay: 1
+        host: "{{ item.public_ip }}"
+        port: 22
+        state: started
+        timeout: 30
+      with_items: "{{ gce.instance_data }}"
+
+- name: Setup GCE instance
+  hosts: my-always-free-instance
+  roles:
+    - docker-ce
+  pre_tasks:
+    - name: Update packages
+      become: true
+      apt:
+        upgrade: full
+        update_cache: yes
