@@ -3,10 +3,13 @@ help:
 	@echo "My Ansible Playbooks" && \
 	echo  "                    "
 
-.check_ansible_user:
-ifndef ANSIBLE_USER
-	$(error ANSIBLE_USER is undefined)
-endif
+require-%:
+	@ if [ "${${*}}" = "" ]; then \
+		echo "Environment variable $* not set"; \
+		exit 1; \
+	fi
+
+.check_ansible_user: require-ANSIBLE_USER
 
 virtualenv:
 	virtualenv --python=python2 ~/virtualenv-ansible
