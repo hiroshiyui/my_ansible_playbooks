@@ -15,6 +15,7 @@
         image_family: ubuntu-1604-lts
         state: present
         disk_size: 60
+        persistent_boot_disk: yes
         ip_forward: yes
         tags:
           - redmine-server
@@ -37,7 +38,7 @@
 
 - name: Setup Redmine
   hosts: my-gce-redmine
-  become: true
   gather_facts: yes
   roles:
     - redmine-server
+    - mmannerm.bash_it

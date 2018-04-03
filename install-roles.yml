@@ -1,3 +1,5 @@
 # Stouts.openvpn
 - src: Stouts.openvpn
   version: 2.4.0
+
+- src: mmannerm.bash_it
