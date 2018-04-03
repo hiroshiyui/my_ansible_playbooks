@@ -1,0 +1,28 @@
+---
+- name: Update APT cache
+  apt:
+    update_cache: yes
+
+- name: Specify MySQL root password before installing
+  debconf: name='mysql-server' question='mysql-server/root_password' value='{{mysql_root_password | quote}}' vtype='password'
+  become: true
+
+- name: Confirm MySQL root password before installing
+  debconf: name='mysql-server' question='mysql-server/root_password_again' value='{{mysql_root_password | quote}}' vtype='password'
+  become: true
+
+- name: Install essential packages
+  apt:
+    name: '{{ item }}'
+  with_items:
+    - ruby
+    - ruby-dev
+    - mysql-client
+    - mysql-server
+
+- name: Setup Redmine source code
+  become: false
+  git:
+    repo: 'https://github.com/redmine/redmine.git'
+    dest: /home/hiroshiyui/redmine
+    version: '3.4.4'

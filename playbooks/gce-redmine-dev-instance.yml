@@ -1,0 +1,43 @@
+---
+- name: Initializing the instance
+  hosts: 127.0.0.1
+  connection: local
+  vars:
+    zone: asia-northeast1-a
+  tasks:
+    - name: Create a GCE instance
+      gce:
+        name: 'my-gce-openvpn-{{ zone }}'
+        zone: '{{ zone }}'
+        num_instances: 1
+        machine_type: n1-standard-1
+        image: ubuntu-1604-xenial-v20180323
+        image_family: ubuntu-1604-lts
+        state: present
+        disk_size: 60
+        ip_forward: yes
+        tags:
+          - redmine-server
+      register: gce
+
+    - name: Add host to a group
+      add_host:
+        hostname: '{{ item.public_ip }}'
+        groupname: my-gce-redmine
+      with_items: '{{ gce.instance_data }}'
+
+    - name: Wait for SSH
+      wait_for:
+        delay: 1
+        host: "{{ item.public_ip }}"
+        port: 22
+        state: started
+        timeout: 30
+      with_items: "{{ gce.instance_data }}"
+
+- name: Setup Redmine
+  hosts: my-gce-redmine
+  become: true
+  gather_facts: yes
+  roles:
+    - redmine-server
