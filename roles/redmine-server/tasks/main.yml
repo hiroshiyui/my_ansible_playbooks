@@ -1,6 +1,7 @@
 ---
 - name: Update APT cache
   apt:
+    upgrade: yes
     update_cache: yes
   become: true
 

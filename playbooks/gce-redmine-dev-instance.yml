@@ -7,19 +7,27 @@
   tasks:
     - name: Create a GCE instance
       gce:
-        name: 'my-gce-openvpn-{{ zone }}'
+        name: 'my-gce-redmine-{{ zone }}'
         zone: '{{ zone }}'
-        num_instances: 1
         machine_type: n1-standard-1
         image: ubuntu-1604-xenial-v20180323
         image_family: ubuntu-1604-lts
         state: present
-        disk_size: 60
-        persistent_boot_disk: yes
-        ip_forward: yes
+        persistent_boot_disk: true
+        disk_size: 40
         tags:
           - redmine-server
       register: gce
+
+    - name: Show debugging information
+      debug:
+        msg: '{{ gce }}'
+
+    - name: Ensure the GCE instance is started
+      gce:
+        name: '{{ item.name }}'
+        state: started
+      with_items: '{{ gce.instance_data }}'
 
     - name: Add host to a group
       add_host:
