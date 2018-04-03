@@ -23,12 +23,6 @@
       debug:
         msg: '{{ gce }}'
 
-    - name: Ensure the GCE instance is started
-      gce:
-        name: '{{ item.name }}'
-        state: started
-      with_items: '{{ gce.instance_data }}'
-
     - name: Add host to a group
       add_host:
         hostname: '{{ item.public_ip }}'
