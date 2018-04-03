@@ -18,7 +18,10 @@ ansible_install_roles:
 	ansible-galaxy install -r install-roles.yml
 
 ansible_setup_gce_openvpn: .check_ansible_user
-	export $$(cat .env-gcp | xargs) && ansible-playbook -u $(ANSIBLE_USER) playbooks/openvpn-gce.yml
+	export $$(cat .env-gcp | xargs) && ansible-playbook -u $(ANSIBLE_USER) playbooks/gce-openvpn-instance.yml
 
 ansible_setup_gce_alway_free_resources: .check_ansible_user
 	export $$(cat .env-gcp | xargs) && ansible-playbook -u $(ANSIBLE_USER) playbooks/gce-always-free-resources.yml
+
+ansible_setup_gce_redmine: .check_ansible_user
+	export $$(cat .env-gcp | xargs) && ansible-playbook -u $(ANSIBLE_USER) playbooks/gce-redmine-dev-instance.yml
