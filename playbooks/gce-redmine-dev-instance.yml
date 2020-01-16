@@ -38,6 +38,19 @@
         timeout: 30
       with_items: "{{ gce.instance_data }}"
 
+    - name: Setup GCP firewall rules
+      block:
+      - name: Allow port 3000 for application server access
+        gce_net:
+          name: default
+          fwname: redmine-server-app
+          allowed: tcp:3000
+          state: present
+          src_range:
+            - '0.0.0.0/0'
+          target_tags:
+            - redmine-server
+
 - name: Setup Redmine
   hosts: my-gce-redmine
   gather_facts: yes

@@ -17,10 +17,16 @@
   apt:
     name: '{{ item }}'
   with_items:
+    - build-essential
     - ruby
     - ruby-dev
+    - ruby-bundler
     - mysql-client
     - mysql-server
+    - libmysqlclient-dev
+    - libxml2-dev
+    - libmagickcore-dev
+    - libmagickwand-dev
   become: true
 
 - name: Setup Redmine source code
@@ -28,4 +34,8 @@
     repo: 'https://github.com/redmine/redmine.git'
     dest: /home/hiroshiyui/redmine
     version: '3.4.4'
-  become: false
+
+- name: Setup redmine-trello-card-sync source code
+  git:
+    repo: 'git@github.com:hiroshiyui/redmine-trello-card-sync.git'
+    dest: /home/hiroshiyui/redmine/plugins/redmine_trello_card_sync

@@ -6,16 +6,16 @@
   tasks:
     - name: Create a GCE instance
       gce:
-        name: 'my-always-free-instance-{{ zone }}'
+        instance_names: my-always-free-instance-{{ zone }}
         zone: '{{ zone }}'
-        num_instances: 1
         machine_type: f1-micro
-        image: ubuntu-1604-xenial-v20180112
+        image: ubuntu-1604-xenial-v20200108
         image_family: ubuntu-1604-lts
         state: present
         ip_forward: yes
         tags:
           - my-always-free-instance
+          - openvpn-server
       register: gce
 
     - name: Debug
@@ -39,11 +39,60 @@
 
 - name: Setup GCE instance
   hosts: my-always-free-instance
+  become: true
   roles:
-    - docker-ce
+    # - docker-ce
+    # - Stouts.openvpn
+    # - openvpn-server
+  vars:
+    openvpn_key_size: 2048
+    openvpn_use_pam: yes
+    openvpn_clients:
+      - my-gce-openvpn
+    openvpn_server_options:
+      - 'management 127.0.0.1 9801'
+      - 'tun-mtu 1500'
+      - 'mssfix 1300'
+      - 'push "redirect-gateway def1 bypass-dhcp"'
+    openvpn_client_options:
+      - 'tun-mtu 1500'
+      - 'mssfix 1300'
+    gce_project: "{{ lookup('env', 'GCE_PROJECT') }}"
+    gce_email: "{{ lookup('env', 'GCE_EMAIL') }}"
+    gce_credentials_file_path: "{{ lookup('env', 'GCE_CREDENTIALS_FILE_PATH') }}"
+
   pre_tasks:
-    - name: Update packages
-      become: true
-      apt:
-        upgrade: full
-        update_cache: yes
+    # - name: Update packages
+    #   become: true
+    #   apt:
+    #     upgrade: full
+    #     update_cache: yes
+    # - name: Reboot the instance because we have full updated the system in the previous task
+    #   reboot:
+    #     reboot_timeout: 3600
+  tasks:
+    # - name: Setup GCP firewall rules
+    #   gce_net:
+    #     name: default
+    #     fwname: openvpn-server
+    #     allowed: udp:1194
+    #     state: present
+    #     src_range:
+    #       - '0.0.0.0/0'
+    #     target_tags:
+    #       - openvpn-server
+    - name: Setup GCP firewall rules
+      gcp_compute_firewall:
+        name: openvpn-server
+        allowed:
+          - ip_protocol: udp
+            ports:
+              - '1194'
+        source_ranges:
+          - '0.0.0.0/0'
+        target_tags:
+          - openvpn-server
+        project: "{{ gce_project }}"
+        auth_kind: serviceaccount
+        service_account_file: "{{ gce_credentials_file_path }}"
+        state: present
